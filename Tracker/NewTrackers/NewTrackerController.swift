@@ -11,13 +11,13 @@ final class NewTrackerController: UIViewController {
     
     weak var delegate: TrackerCreationDelegete?
     
-    private let habitButton = {
+    private lazy var habitButton = {
         let habitButton = Button(title: "Привычка", backColor: .yBlack, textColor: .yWhite)
         habitButton.addTarget(self, action: #selector(addNewHabit), for: .touchUpInside)
         return habitButton
     }()
     
-    private let eventButton = {
+    private lazy var eventButton = {
         let eventButton = Button(title: "Нерегулярное событие", backColor: .yBlack, textColor: .yWhite)
         eventButton.addTarget(self, action: #selector(addNewEvent), for: .touchUpInside)
         return eventButton

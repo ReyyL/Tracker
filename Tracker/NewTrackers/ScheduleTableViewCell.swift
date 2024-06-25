@@ -16,14 +16,14 @@ final class ScheduleTableViewCell: UITableViewCell {
     
     weak var delegate: WeekdayDelegate?
     
-    let titleView: UILabel = {
+    private lazy var titleView: UILabel = {
         let titleView = UILabel()
         titleView.translatesAutoresizingMaskIntoConstraints = false
         titleView.font = .systemFont(ofSize: 17)
         return titleView
     }()
     
-    private var daySwitch: UISwitch = {
+    private lazy var daySwitch: UISwitch = {
         let daySwitch = UISwitch()
         daySwitch.onTintColor = .yBlue
         daySwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -56,7 +56,7 @@ final class ScheduleTableViewCell: UITableViewCell {
     }
     
     private func setupSchedule() {
-        contentView.backgroundColor = .yLightGray
+        contentView.backgroundColor = .yLightGrayAlpha
         
         contentView.addSubview(titleView)
         contentView.addSubview(daySwitch)

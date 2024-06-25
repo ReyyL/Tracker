@@ -13,8 +13,10 @@ final class TrackerTextField: UITextField {
         let paddingView : UIView = UIView.init(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
         self.leftView = paddingView
         self.leftViewMode = .always
+        self.rightView = paddingView
+        self.rightViewMode = .always
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.backgroundColor = .yLightGray
+        self.backgroundColor = .yLightGrayAlpha
         self.layer.cornerRadius = 16
         self.placeholder = placeholder
     }

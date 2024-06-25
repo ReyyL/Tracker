@@ -16,15 +16,15 @@ final class CategoriesViewController: UIViewController {
     
     weak var delegate: CategoryDelegate?
     
-    private let tableView = {
+    private lazy var tableView = {
         let tableView = UITableView()
         tableView.layer.cornerRadius = 16
-        tableView.backgroundColor = .yLightGray
+        tableView.backgroundColor = .yLightGrayAlpha
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private let saveButton = {
+    private lazy var saveButton = {
         let saveButton = Button(title: "Добавить новую категорию", backColor: .yBlack, textColor: .yWhite)
         saveButton.isEnabled = false
         saveButton.addTarget(self, action: #selector(createNewCategory), for: .touchUpInside)
@@ -88,7 +88,7 @@ extension CategoriesViewController: UITableViewDataSource {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
         cell.textLabel?.text = "Категория"
         cell.selectionStyle = .none
-        cell.backgroundColor = .yLightGray
+        cell.backgroundColor = .yLightGrayAlpha
         
         return cell
     }

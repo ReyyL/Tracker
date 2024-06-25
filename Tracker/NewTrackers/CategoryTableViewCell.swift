@@ -9,7 +9,7 @@ import UIKit
 
 final class CategoryTableViewCell: UITableViewCell {
     
-    var title: UILabel = {
+    private lazy var title: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = .systemFont(ofSize: 17)
@@ -23,7 +23,7 @@ final class CategoryTableViewCell: UITableViewCell {
         
         addSubview(title)
         
-        contentView.backgroundColor = .yLightGray
+        contentView.backgroundColor = .yLightGrayAlpha
         contentView.layer.cornerRadius = 16
         
         NSLayoutConstraint.activate([

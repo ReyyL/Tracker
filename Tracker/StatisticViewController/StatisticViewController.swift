@@ -8,7 +8,6 @@
 import UIKit
 
 final class StatisticViewController: UIViewController {
-    let search = UISearchBar()
     
     override func viewDidLoad() {
         super.viewDidLoad()

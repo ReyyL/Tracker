@@ -11,18 +11,18 @@ final class NewEventViewController: UIViewController {
     
     weak var delegate: TrackerCreationDelegete?
     
-    private let tableView = {
+    private lazy var tableView = {
         let tableView = TrackerTable()
         return tableView
     }()
     
-    private let categoryTextField = {
+    private lazy var categoryTextField = {
         let categoryTextField = TrackerTextField(placeholder: "Введите название трекера")
         categoryTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         return categoryTextField
     }()
     
-    private let cancelButton = {
+    private lazy var cancelButton = {
         let cancelButton = Button(title: "Отменить", backColor: .yWhite, textColor: .yRed)
         cancelButton.layer.borderColor = UIColor.yRed.cgColor
         cancelButton.layer.borderWidth = 1
@@ -30,7 +30,7 @@ final class NewEventViewController: UIViewController {
         return cancelButton
     }()
     
-    private let saveButton = {
+    private lazy var saveButton = {
         let saveButton = Button(title: "Создать", backColor: .yGray, textColor: .yWhite)
         saveButton.isEnabled = false
         saveButton.addTarget(self, action: #selector(saveTrackerScreen), for: .touchUpInside)
@@ -145,11 +145,13 @@ extension NewEventViewController: UITableViewDataSource {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         
         cell.accessoryType = .disclosureIndicator
-        cell.backgroundColor = .yLightGray
+        cell.backgroundColor = .yLightGrayAlpha
         cell.layer.cornerRadius = 16
         
         cell.textLabel?.text = "Категория"
+        cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.detailTextLabel?.text = selectedCategory
+        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
         cell.detailTextLabel?.textColor = .yGray
         
         return cell

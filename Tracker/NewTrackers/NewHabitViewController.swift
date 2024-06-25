@@ -20,13 +20,13 @@ final class NewHabitViewController: UIViewController {
         return tableView
     }()
     
-    private let categoryTextField = {
+    private lazy var categoryTextField = {
         let categoryTextField = TrackerTextField(placeholder: "Введите название трекера")
         categoryTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         return categoryTextField
     }()
     
-    private let cancelButton = {
+    private lazy var cancelButton = {
         let cancelButton = Button(title: "Отменить", backColor: .yWhite, textColor: .yRed)
         cancelButton.layer.borderColor = UIColor.yRed.cgColor
         cancelButton.layer.borderWidth = 1
@@ -34,14 +34,14 @@ final class NewHabitViewController: UIViewController {
         return cancelButton
     }()
     
-    private let saveButton = {
+    private lazy var saveButton = {
         let saveButton = Button(title: "Создать", backColor: .yGray, textColor: .yWhite)
         saveButton.isEnabled = false
         saveButton.addTarget(self, action: #selector(saveTrackerScreen), for: .touchUpInside)
         return saveButton
     }()
     
-    private let table = ["Категория", "Расписание"]
+    private lazy var tableCellTitles = ["Категория", "Расписание"]
     
     private var selectedDays = [Weekday]()
     
@@ -149,7 +149,7 @@ extension NewHabitViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let name = table[indexPath.row]
+        let name = tableCellTitles[indexPath.row]
         
         switch name {
         case "Категория" :
@@ -164,22 +164,23 @@ extension NewHabitViewController: UITableViewDelegate {
 
 extension NewHabitViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        table.count
+        tableCellTitles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         
         cell.accessoryType = .disclosureIndicator
-        cell.backgroundColor = .yLightGray
+        cell.backgroundColor = .yLightGrayAlpha
         cell.layer.cornerRadius = 16
         
-        let name = "\(table[indexPath.row])"
+        let name = "\(tableCellTitles[indexPath.row])"
         cell.textLabel?.text = name
+        cell.textLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.detailTextLabel?.textColor = .yGray
         
         if name == "Категория" {
             cell.detailTextLabel?.text = selectedCategory
-            cell.detailTextLabel?.textColor = .yGray
         }
         
         if name == "Расписание" {
@@ -192,9 +193,10 @@ extension NewHabitViewController: UITableViewDataSource {
             cell.detailTextLabel?.text = strDays.count == 7 
             ? "Каждый день"
             : strDays.joined(separator: ", ")
-            
-            cell.detailTextLabel?.textColor = .yGray
         }
+        
+        cell.detailTextLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        cell.detailTextLabel?.textColor = .yGray
         return cell
     }
 }

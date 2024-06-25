@@ -31,7 +31,7 @@ final class ScheduleViewController: UIViewController {
     
     private var selectedDays = [Weekday]()
     
-    private let tableView = {
+    private lazy var tableView = {
         let tableView = UITableView()
         tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.layer.cornerRadius = 16
@@ -41,7 +41,7 @@ final class ScheduleViewController: UIViewController {
         return tableView
     }()
     
-    private let readyButton = {
+    private lazy var readyButton = {
         
         let readyButton = Button(title: "Готово", backColor: .yBlack, textColor: .yWhite)
         return readyButton

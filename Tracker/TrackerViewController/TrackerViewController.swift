@@ -21,9 +21,9 @@ final class TrackerViewController: UIViewController {
     
     var completedTrackers: [TrackerRecord] = []
     
-    private let emptyTrackersView = UIView()
+    private lazy var emptyTrackersView = UIView()
     
-    private let datePicker: UIDatePicker = {
+    private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         let currentDate = Date()
@@ -37,14 +37,14 @@ final class TrackerViewController: UIViewController {
         return datePicker
     }()
     
-    private let starImage = {
+    private lazy var starImage = {
         let starImage = UIImageView()
         starImage.image = UIImage(named: "starWhenEmpty")
         starImage.translatesAutoresizingMaskIntoConstraints = false
         return starImage
     }()
     
-    private let emptyLabel = {
+    private lazy var emptyLabel = {
         let emptyLabel = UILabel()
         emptyLabel.text = "Что будем отслеживать?"
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false

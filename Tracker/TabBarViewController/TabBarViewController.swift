@@ -39,5 +39,10 @@ final class TabBarViewController: UITabBarController {
         self.viewControllers = [trackerNavigationController, statisticNavigationController]
         
         tabBar.unselectedItemTintColor = .yGray
+        
+        let topBorder = CALayer()
+        topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.frame.size.width, height: 1.0)
+        topBorder.backgroundColor = UIColor.yBlackAlpha.cgColor
+        tabBar.layer.addSublayer(topBorder)
     }
 }

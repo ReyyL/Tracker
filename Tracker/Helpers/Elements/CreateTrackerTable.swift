@@ -13,7 +13,7 @@ final class TrackerTable: UITableView {
         super.init(frame: .zero, style: .plain)
         
         self.layer.cornerRadius = 16
-        self.backgroundColor = .yLightGray
+        self.backgroundColor = .yLightGrayAlpha
         self.translatesAutoresizingMaskIntoConstraints = false
         self.register(CategoryTableViewCell.self, forCellReuseIdentifier: "cell")
     }

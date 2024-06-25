@@ -21,7 +21,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     weak var delegate: CompleteTrackerProtocol?
     
-    private let emojiView: UIView = {
+    private lazy var emojiView: UIView = {
         let emojiView = UIView()
         emojiView.translatesAutoresizingMaskIntoConstraints = false
         emojiView.layer.cornerRadius = 12
@@ -31,24 +31,25 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return emojiView
     }()
     
-    private let emoji: UILabel = {
+    private lazy var emoji: UILabel = {
         let emoji = UILabel()
         emoji.translatesAutoresizingMaskIntoConstraints = false
         emoji.font = .systemFont(ofSize: 12, weight: .medium)
         return emoji
     }()
     
-    private let title: UILabel = {
+    private lazy var title: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = .systemFont(ofSize: 12, weight: .medium)
         title.textColor = .yWhite
         title.numberOfLines = 2
+        title.textAlignment = .left
         return title
         
     }()
     
-    private let date: UILabel = {
+    private lazy var date: UILabel = {
         let date = UILabel()
         date.translatesAutoresizingMaskIntoConstraints = false
         date.font = .systemFont(ofSize: 12, weight: .medium)
@@ -56,14 +57,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return date
     }()
     
-    var plusButton: UIButton = {
+    lazy var plusButton: UIButton = {
         let plusButton = UIButton()
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         plusButton.addTarget(self, action: #selector(addDayForTracker), for: .touchUpInside)
         return plusButton
     }()
     
-    private let bodyView: UIView = {
+    private lazy var bodyView: UIView = {
         let bodyView = UIView()
         bodyView.layer.cornerRadius = 16
         bodyView.translatesAutoresizingMaskIntoConstraints = false
@@ -97,7 +98,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             emoji.centerXAnchor.constraint(equalTo: emojiView.centerXAnchor),
             emoji.centerYAnchor.constraint(equalTo: emojiView.centerYAnchor),
             
-            title.centerXAnchor.constraint(equalTo: bodyView.centerXAnchor),
+            title.leadingAnchor.constraint(equalTo: bodyView.safeAreaLayoutGuide.leadingAnchor, constant: 12),
+            title.trailingAnchor.constraint(equalTo: bodyView.safeAreaLayoutGuide.trailingAnchor, constant: -12),
             title.bottomAnchor.constraint(equalTo: bodyView.bottomAnchor, constant: -12),
             
             date.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
