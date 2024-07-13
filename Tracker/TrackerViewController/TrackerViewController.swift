@@ -11,6 +11,11 @@ final class TrackerViewController: UIViewController {
     
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
+    private let trackerStore = TrackerStore()
+    private let trackerCategoryStore = TrackerCategoryStore()
+    private let trackerRecordStore = TrackerRecordStore()
+    
+    private var trackers: [Tracker] = []
     private var categories: [TrackerCategory] = []
     
     private var currentDate = Date()
@@ -58,10 +63,21 @@ final class TrackerViewController: UIViewController {
         
         setupScreen()
         setupCollection()
-        view.backgroundColor = .yWhite
+        
+        loadFromCoreData()
+        
+        trackerStore.delegate = self
+    }
+    
+    private func loadFromCoreData() {
+        trackers = trackerStore.trackers
+        completedTrackers = trackerRecordStore.trackerRecords
+        categories = [TrackerCategory(title: "Категория", trackersArray: trackers)]
     }
     
     private func setupScreen() {
+        
+        view.backgroundColor = .yWhite
         
         let plusImageView = UIBarButtonItem(image: UIImage(named: "plusNav"),
                                             style: .plain, target: self,
@@ -77,7 +93,6 @@ final class TrackerViewController: UIViewController {
         navigationItem.searchController = searchController
         searchController.searchBar.placeholder = "Поиск"
         
-//        emptyTrackersView.isHidden = false
         emptyTrackersView.addSubview(starImage)
         emptyTrackersView.addSubview(emptyLabel)
         
@@ -173,23 +188,25 @@ final class TrackerViewController: UIViewController {
         
         present(navigationNewTrackerController, animated: true)
     }
-    
-    @objc private func addDay() {
-        
-    }
 }
 
 extension TrackerViewController: CompleteTrackerProtocol {
     func completeTracker(id: UUID, indexPath: IndexPath) {
         let completedTracker = TrackerRecord(id: id, trackerDate: datePicker.date)
+        trackerRecordStore.saveToCoreData(completedTracker)
         completedTrackers.append(completedTracker)
         collectionView.reloadItems(at: [indexPath])
     }
     
     func uncompleteTracker(id: UUID, indexPath: IndexPath) {
         completedTrackers.removeAll { trackerRecord in
+            
             let isSameDay = Calendar.current.isDate(trackerRecord.trackerDate, inSameDayAs: datePicker.date)
-            return trackerRecord.id == id && isSameDay
+            if trackerRecord.id == id && isSameDay {
+                trackerRecordStore.deleteFromCoreData(trackerRecord)
+                return true
+            }
+            return false
         }
         collectionView.reloadItems(at: [indexPath])
     }
@@ -210,7 +227,6 @@ extension TrackerViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         visibleCategories[section].trackersArray.count
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -284,6 +300,7 @@ extension TrackerViewController: TrackerCreationDelegete {
         
         let categoryFound = categories.filter { $0.title == category }
         
+        trackerStore.saveToCoreData(tracker)
         var trackers: [Tracker] = []
         if categoryFound.count > 0 {
             categoryFound.forEach { trackers = trackers + $0.trackersArray }
@@ -293,11 +310,13 @@ extension TrackerViewController: TrackerCreationDelegete {
             categories = categories.filter { $0.title != category }
             
             if !trackers.isEmpty {
-                categories.append(TrackerCategory(title: category, trackersArray: trackers))
+                let newCategory = TrackerCategory(title: category, trackersArray: trackers)
+                categories.append(newCategory)
             }
             
         } else {
-            categories.append(TrackerCategory(title: category, trackersArray: [tracker]))
+            let newSoloTracker = TrackerCategory(title: category, trackersArray: [tracker])
+            categories.append(newSoloTracker)
         }
         
         updateCollection()
@@ -305,6 +324,14 @@ extension TrackerViewController: TrackerCreationDelegete {
     
     private func updateCollection() {
         visibleCategories = changeDate()
+        collectionView.reloadData()
+    }
+}
+
+extension TrackerViewController: TrackerStoreDelegate {
+    
+    func storeDidChange(_ store: TrackerStore) {
+        trackers = trackerStore.trackers
         collectionView.reloadData()
     }
 }
