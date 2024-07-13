@@ -23,9 +23,7 @@ extension UIColor {
                   blue: CGFloat(rgb & 0x0000FF) / 255.0,
                   alpha: 1.0)
     }
-}
-
-extension UIColor {
+    
     func toHexString() -> String {
         guard let components = self.cgColor.components else {
             return ""
