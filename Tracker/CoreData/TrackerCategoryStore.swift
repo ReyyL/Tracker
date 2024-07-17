@@ -65,11 +65,7 @@ final class TrackerCategoryStore: NSObject {
     func saveToCoreData(_ obj: TrackerCategory) {
         let coreData = TrackerCategoryCoreData(context: context)
         coreData.title = obj.title
-        coreData.trackers = obj.trackersArray.compactMap {
-            let cd = TrackerCoreData(context: context)
-            cd.id = $0.id
-            return cd
-        }
+        coreData.trackers = NSSet(array: [])
         try? context.save()
     }
     
@@ -82,18 +78,21 @@ final class TrackerCategoryStore: NSObject {
     }
     
     // в трекеры конкретной категории в кордате добавляем норм категории
-    func addToCoreDataCategory(with title: String) {
+    func addToCoreDataCategory(with title: String, tracker: Tracker) {
+        let trackers = trackerStore.getCoreDataTrackers()
         guard let coreData = findCoreDataTitle(with: title) else {
             fatalError()
         }
-        coreData.trackers = trackerCategories.first {
-            $0.title == title // ищем из всех категорий первый где заголовки совпадают с искомым
-        }?.trackersArray.compactMap { // в каждом массиве трекеров конвертируем трекеры в кор дату
-            let trackerCoreData = TrackerCoreData(context: context)
-            trackerCoreData.id = $0.id
-            return trackerCoreData
+        var existingTrackers = coreData.trackers?.allObjects as? [TrackerCoreData] ?? []
+        if let index = trackers.firstIndex(where: {$0.id == tracker.id}) {
+            existingTrackers.append(trackers[index])
         }
+        coreData.trackers = NSSet(array: existingTrackers)
         try? context.save()
+    }
+    
+    func addCategoryTitleToCoreData(title: String) {
+        
     }
     
     // делаем из кордаты норм категории трекеров
@@ -104,12 +103,14 @@ final class TrackerCategoryStore: NSObject {
         else {
             return nil
         }
+//        print(title)
         let result = TrackerCategory(
             title: title,
-            trackersArray: trackerStore.trackers.filter { tracker in
-                trackers.contains(where: {
-                    tracker.id == $0.id
-                })
+            trackersArray:  trackers.compactMap { coreDataTracker -> Tracker? in
+                if let coreDataTracker = coreDataTracker as? TrackerCoreData {
+                    return trackerStore.toNormalTracker(from: coreDataTracker)
+                }
+                return nil
             }
         )
         return result

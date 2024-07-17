@@ -49,6 +49,14 @@ final class TrackerStore: NSObject {
         return controller
     }()
     
+    func getCoreDataTrackers() -> [TrackerCoreData] {
+        guard let objects = fetchedResultController.fetchedObjects else {
+            return []
+        }
+        
+        return objects
+    }
+    
     // конвертируем в кордату норм трекер
     func saveToCoreData(_ obj: Tracker) {
         let coreData = TrackerCoreData(context: context)
@@ -63,7 +71,7 @@ final class TrackerStore: NSObject {
     }
     
     // из кордаты в трекер
-    private func toNormalTracker(from coreData: TrackerCoreData) -> Tracker? {
+    func toNormalTracker(from coreData: TrackerCoreData) -> Tracker? {
         guard let id = coreData.id,
               let emoji = coreData.emoji,
               let color = coreData.color,

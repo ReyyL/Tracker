@@ -72,7 +72,8 @@ final class TrackerViewController: UIViewController {
     private func loadFromCoreData() {
         trackers = trackerStore.trackers
         completedTrackers = trackerRecordStore.trackerRecords
-        categories = [TrackerCategory(title: "Категория", trackersArray: trackers)]
+        print(trackerCategoryStore.trackerCategories)
+        categories = trackerCategoryStore.trackerCategories
     }
     
     private func setupScreen() {
@@ -325,9 +326,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
 }
 
 extension TrackerViewController: TrackerCreationDelegete {
-    func createTracker(tracker: Tracker) {
-        
-        let category = "Категория"
+    func createTracker(tracker: Tracker, category: String) {
         
         let categoryFound = categories.filter { $0.title == category }
         
@@ -342,14 +341,18 @@ extension TrackerViewController: TrackerCreationDelegete {
             
             if !trackers.isEmpty {
                 let newCategory = TrackerCategory(title: category, trackersArray: trackers)
+                
+//                trackerCategoryStore.saveToCoreData(newCategory)
                 categories.append(newCategory)
             }
             
         } else {
             let newSoloTracker = TrackerCategory(title: category, trackersArray: [tracker])
+            trackerCategoryStore.saveToCoreData(newSoloTracker)
+            
             categories.append(newSoloTracker)
         }
-        
+        trackerCategoryStore.addToCoreDataCategory(with: category, tracker: tracker)
         updateCollection()
     }
     
