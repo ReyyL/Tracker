@@ -32,11 +32,38 @@ final class CategoriesViewController: UIViewController {
         return saveButton
     }()
     
+    private lazy var image: UIImageView = {
+        let image = UIImageView()
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.image = UIImage(named: "starWhenEmpty")
+        return image
+    }()
+    
+    private let label: UILabel = {
+        let label = UILabel()
+        label.text = "Привычки и события можно \nобъединить по смыслу"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var placeholderStackView = {
+        let stackView = UIStackView(arrangedSubviews: [image,label])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 8
+        stackView.isHidden = true
+        return stackView
+    }()
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
         setupScreen()
         viewModel?.loadCategories()
+        showPlaceholder()
     }
     
     @objc
@@ -47,7 +74,18 @@ final class CategoriesViewController: UIViewController {
         present(navigationVC, animated: true)
     }
     
+    private func showPlaceholder() {
+        
+        if let categories = viewModel?.categories.count {
+            if categories == 0 {
+                placeholderStackView.isHidden = false
+            }
+        }
+    }
+    
     private func setupScreen() {
+        
+        
         title = "Категория"
         
         tableView.delegate = self
@@ -59,11 +97,20 @@ final class CategoriesViewController: UIViewController {
         
         view.addSubview(createButton)
         
+        view.addSubview(placeholderStackView)
+        
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             tableView.bottomAnchor.constraint(equalTo: createButton.topAnchor),
+            
+            placeholderStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            placeholderStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            placeholderStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            image.heightAnchor.constraint(equalToConstant: 80),
+            image.widthAnchor.constraint(equalToConstant: 80),
             
             createButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 20),
             createButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -20),
@@ -112,5 +159,7 @@ extension CategoriesViewController: CategoryCreationDelegate {
             viewModel?.categories.append(text)
         }
         tableView.reloadData()
+        trackerCategoryStore.saveToCoreData(TrackerCategory(title: text, trackersArray: []))
+        placeholderStackView.isHidden = true
     }
 }

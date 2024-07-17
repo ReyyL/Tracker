@@ -342,14 +342,11 @@ extension TrackerViewController: TrackerCreationDelegete {
             if !trackers.isEmpty {
                 let newCategory = TrackerCategory(title: category, trackersArray: trackers)
                 
-//                trackerCategoryStore.saveToCoreData(newCategory)
                 categories.append(newCategory)
             }
             
         } else {
             let newSoloTracker = TrackerCategory(title: category, trackersArray: [tracker])
-            trackerCategoryStore.saveToCoreData(newSoloTracker)
-            
             categories.append(newSoloTracker)
         }
         trackerCategoryStore.addToCoreDataCategory(with: category, tracker: tracker)
