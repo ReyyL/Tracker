@@ -142,15 +142,17 @@ class TrackerCreationViewController: UIViewController {
         guard let trackerName = categoryTextField.text else { return }
         let newTracker = Tracker(id: UUID(), name: trackerName, color: selectedColor, emoji: selectedEmoji, schedule: selectedDays)
         
-        delegate?.createTracker(tracker: newTracker)
+        delegate?.createTracker(tracker: newTracker, category: selectedCategory)
         self.dismiss(animated: true)
     }
     
     func chooseCategory() {
+        let categoryViewModel = CategoriesViewModel()
         let categoryViewController = CategoriesViewController()
-        let navigationCategoryViewController = UINavigationController(rootViewController: categoryViewController)
-        categoryViewController.delegate = self
-        present(navigationCategoryViewController, animated: true)
+        categoryViewController.viewModel = categoryViewModel
+        categoryViewModel.delegate = self
+        let navigationVC = UINavigationController(rootViewController: categoryViewController)
+        present(navigationVC, animated: true)
     }
     
     func checkIfSaveButtonIsEnabled() {
