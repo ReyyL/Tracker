@@ -10,7 +10,6 @@
  - аналитику на фильтры и контекст
  - скриншот тесты
  - контекст меню
- - фильтры
  */
 
 import UIKit
@@ -202,6 +201,7 @@ final class TrackerViewController: UIViewController {
     }
     
     @objc private func openFilters() {
+        sendAnalytics(mainEvent: "filter_tap", event: "click", screen: "Main", item: "filter")
         let filterController = FilterController()
         let navigationFilterController = UINavigationController(rootViewController: filterController)
         filterController.delegate = self
