@@ -85,7 +85,6 @@ final class CategoriesViewController: UIViewController {
     
     private func setupScreen() {
         
-        
         title = "Категория"
         
         tableView.delegate = self

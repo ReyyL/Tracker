@@ -5,7 +5,16 @@
 //  Created by Andrey Lazarev on 02.06.2024.
 //
 
+/**
+ Добавить
+ - аналитику на фильтры и контекст
+ - скриншот тесты
+ - контекст меню
+ - фильтры
+ */
+
 import UIKit
+import YandexMobileMetrica
 
 final class TrackerViewController: UIViewController {
     
@@ -28,6 +37,8 @@ final class TrackerViewController: UIViewController {
     
     private lazy var emptyTrackersView = UIView()
     
+    private lazy var notFoundView = UIView()
+    
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
@@ -42,6 +53,22 @@ final class TrackerViewController: UIViewController {
         return datePicker
     }()
     
+    private lazy var notFoundImage = {
+        let starImage = UIImageView()
+        starImage.image = UIImage(named: "notFound")
+        starImage.translatesAutoresizingMaskIntoConstraints = false
+        return starImage
+    }()
+    
+    private lazy var notFoundLabel = {
+        let emptyLabel = UILabel()
+        emptyLabel.text = NSLocalizedString("not_found", comment: "")
+        emptyLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyLabel.textColor = .yBlack
+        emptyLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        return emptyLabel
+    }()
+    
     private lazy var starImage = {
         let starImage = UIImageView()
         starImage.image = UIImage(named: "starWhenEmpty")
@@ -51,11 +78,21 @@ final class TrackerViewController: UIViewController {
     
     private lazy var emptyLabel = {
         let emptyLabel = UILabel()
-        emptyLabel.text = "Что будем отслеживать?"
+        emptyLabel.text = NSLocalizedString("what_track", comment: "")
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.textColor = .yBlack
         emptyLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
         return emptyLabel
+    }()
+    
+    private lazy var filtersButton = {
+        let title = NSLocalizedString("filters", comment: "")
+        let filtersButton = Button(title: title, backColor: .yBlack, textColor: .yWhite)
+        filtersButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        filtersButton.backgroundColor = .yBlue
+        filtersButton.addTarget(self, action: #selector(openFilters), for: .touchUpInside)
+        filtersButton.translatesAutoresizingMaskIntoConstraints = false
+        return filtersButton
     }()
     
     override func viewDidLoad() {
@@ -67,12 +104,24 @@ final class TrackerViewController: UIViewController {
         loadFromCoreData()
         
         trackerStore.delegate = self
+        
+        sendAnalytics(mainEvent: "main_page", event: "open", screen: "Main", item: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        sendAnalytics(mainEvent: "main_page", event: "close", screen: "Main", item: nil)
+    }
+    
+    private func sendAnalytics(mainEvent: String, event: String, screen: String, item: String?) {
+        let params : [AnyHashable : Any] = ["event" : event, "screen": screen, "item": item]
+        YMMYandexMetrica.reportEvent(event, parameters: params, onFailure: { error in
+            print("REPORT ERROR: %@", error.localizedDescription)
+        })
     }
     
     private func loadFromCoreData() {
         trackers = trackerStore.trackers
         completedTrackers = trackerRecordStore.trackerRecords
-        print(trackerCategoryStore.trackerCategories)
         categories = trackerCategoryStore.trackerCategories
     }
     
@@ -90,25 +139,33 @@ final class TrackerViewController: UIViewController {
         let datePickerView = UIBarButtonItem(customView: datePicker)
         navigationItem.rightBarButtonItem = datePickerView
         
+        navigationController?.navigationBar.backgroundColor = .yWhite
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.yBlack]
+        
         let searchController = UISearchController()
         navigationItem.searchController = searchController
-        searchController.searchBar.placeholder = "Поиск"
+        searchController.searchBar.placeholder = NSLocalizedString("search", comment: "")
         
         emptyTrackersView.addSubview(starImage)
         emptyTrackersView.addSubview(emptyLabel)
         
+        notFoundView.addSubview(notFoundImage)
+        notFoundView.addSubview(notFoundLabel)
+        
         view.addSubview(emptyTrackersView)
+        view.addSubview(notFoundView)
         
         NSLayoutConstraint.activate([
             starImage.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             starImage.topAnchor.constraint(equalTo: view.centerYAnchor),
             emptyLabel.topAnchor.constraint(equalTo: starImage.bottomAnchor, constant: 8),
             emptyLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)
-            
         ])
     }
     
     private func setupCollection() {
+        
+        collectionView.backgroundColor = .yWhite
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -120,11 +177,19 @@ final class TrackerViewController: UIViewController {
         
         view.addSubview(collectionView)
         
+        view.addSubview(filtersButton)
+        
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filtersButton.heightAnchor.constraint(equalToConstant: 50),
+            filtersButton.widthAnchor.constraint(equalToConstant: 114),
+            filtersButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)
+            
         ])
     }
     
@@ -134,6 +199,13 @@ final class TrackerViewController: UIViewController {
         dateFormatter.dateFormat = "dd.MM.yyyy"
         currentDate = selectedDate
         updateCollection()
+    }
+    
+    @objc private func openFilters() {
+        let filterController = FilterController()
+        let navigationFilterController = UINavigationController(rootViewController: filterController)
+        filterController.delegate = self
+        present(navigationFilterController, animated: true)
     }
     
     private func changeDate() -> [TrackerCategory] {
@@ -178,11 +250,14 @@ final class TrackerViewController: UIViewController {
         emptyTrackersView.isHidden = visibleCategories.isEmpty ? false : true
         collectionView.isHidden = visibleCategories.isEmpty ? true : false
         
+        filtersButton.isHidden = collectionView.isHidden ? true : false
+        
         return visibleCategories
     }
     
     @objc private func addTracker() {
         
+        sendAnalytics(mainEvent: "add_tracker", event: "click", screen: "Main", item: "add_track")
         let newTrackerController = NewTrackerController()
         newTrackerController.delegate = self
         let navigationNewTrackerController = UINavigationController(rootViewController: newTrackerController)
@@ -193,6 +268,7 @@ final class TrackerViewController: UIViewController {
 
 extension TrackerViewController: CompleteTrackerProtocol {
     func completeTracker(id: UUID, indexPath: IndexPath) {
+        sendAnalytics(mainEvent: "complete_tracker", event: "click", screen: "Main", item: "track")
         let completedTracker = TrackerRecord(id: id, trackerDate: datePicker.date)
         trackerRecordStore.saveToCoreData(completedTracker)
         completedTrackers.append(completedTracker)
@@ -365,6 +441,66 @@ extension TrackerViewController: TrackerStoreDelegate {
         trackers = trackerStore.trackers
         collectionView.reloadData()
     }
+}
+
+extension TrackerViewController: FilterControllerDelegate {
+    
+    func filterTrackers(filter: String) {
+        
+        var tempTrackers = [Tracker]()
+        var tempCategories = [TrackerCategory]()
+        
+        switch filter {
+        case "Все трекеры": 
+            updateCollection()
+        case "Трекеры на сегодня":
+            datePicker.date = Date()
+            datePickerValueChanged(datePicker)
+        case "Завершенные":
+            updateCollection()
+            visibleCategories.forEach { category in
+                tempTrackers = category.trackersArray.filter { tracker in
+                    
+                    isTrackerComplete(id: tracker.id)
+                }
+                if !tempTrackers.isEmpty {
+                    
+                    tempCategories.append(TrackerCategory(title: category.title, trackersArray: tempTrackers))
+                } else {
+                    emptyTrackersView.isHidden = false
+                    collectionView.isHidden = true
+                }
+            }
+            
+            visibleCategories = tempCategories
+            
+        case "Не завершенные":
+            updateCollection()
+            visibleCategories.forEach { category in
+                tempTrackers = category.trackersArray.filter { tracker in
+                    
+                    !isTrackerComplete(id: tracker.id)
+                }
+                
+                if !tempTrackers.isEmpty {
+                    
+                    tempCategories.append(TrackerCategory(title: category.title, trackersArray: tempTrackers))
+                } else {
+                    emptyTrackersView.isHidden = false
+                    collectionView.isHidden = true
+                }
+            }
+            
+            visibleCategories = tempCategories
+            
+        default:
+            break
+        }
+        
+        collectionView.reloadData()
+    }
+    
+    
 }
 
 

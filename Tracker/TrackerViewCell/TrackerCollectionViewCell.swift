@@ -126,7 +126,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         title.text = tracker.name
         emoji.text = tracker.emoji
-        date.text = "\(completedDays) Дней"
+        date.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "Number of remaining days"),
+            completedDays
+        )
         
         plusButton.tintColor = tracker.color
         let image = isTrackerCompleted ? UIImage(named: "Done") : UIImage(named: "Plus")

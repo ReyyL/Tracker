@@ -9,6 +9,7 @@ import UIKit
 
 final class TrackerViewCellHeader: UICollectionReusableView {
     
+    
     lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.font = .systemFont(ofSize: 19, weight: . bold)

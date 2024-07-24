@@ -16,20 +16,20 @@ final class TabBarViewController: UITabBarController {
         
         let statisticViewController = StatisticViewController()
         
-        trackerViewController.title = "Трекеры"
+        trackerViewController.title = NSLocalizedString("trackers", comment: "")
         
         let trackerNavigationController = UINavigationController(rootViewController: trackerViewController)
         
         let statisticNavigationController = UINavigationController(rootViewController: statisticViewController)
         
         trackerViewController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("trackers", comment: ""),
             image: UIImage(named: "TrackerIcon"),
             selectedImage: nil
         )
         
         statisticViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("statistic", comment: ""),
             image: UIImage(named: "StatisticIcon"),
             selectedImage: nil
         )
@@ -39,6 +39,7 @@ final class TabBarViewController: UITabBarController {
         self.viewControllers = [trackerNavigationController, statisticNavigationController]
         
         tabBar.unselectedItemTintColor = .yGray
+        tabBar.backgroundColor = .yWhite
         
         let topBorder = CALayer()
         topBorder.frame = CGRect(x: 0, y: 0, width: tabBar.frame.size.width, height: 1.0)
