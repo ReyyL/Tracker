@@ -7,8 +7,7 @@
 
 /**
  Добавить
- - аналитику на фильтры и контекст
- - скриншот тесты
+ - аналитику на контекст
  - контекст меню
  */
 
@@ -150,6 +149,7 @@ final class TrackerViewController: UIViewController {
         
         notFoundView.addSubview(notFoundImage)
         notFoundView.addSubview(notFoundLabel)
+        notFoundView.isHidden = true
         
         view.addSubview(emptyTrackersView)
         view.addSubview(notFoundView)
