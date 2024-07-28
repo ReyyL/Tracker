@@ -23,24 +23,10 @@ final class TrackerRecordStore: NSObject {
         
     }
     
-    private lazy var fetchedResultController: NSFetchedResultsController<TrackerRecordCoreData> = {
-        let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
-        
-        let fetchedResultController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil)
-        
-        try? fetchedResultController.performFetch()
-        return fetchedResultController
-    }()
-    
     // сохраняем в кордату норм запись трекеров
     func saveToCoreData(_ obj: TrackerRecord) {
-        let coreData = TrackerRecordCoreData(context: context)
+        guard let entity = NSEntityDescription.entity(forEntityName: "TrackerRecordCoreData", in: context) else { return }
+        let coreData = TrackerRecordCoreData(entity: entity, insertInto: context)
         coreData.id = obj.id
         coreData.date = obj.trackerDate
         try? context.save()
@@ -75,11 +61,14 @@ final class TrackerRecordStore: NSObject {
     }
     
     // конвертируем из кордаты в норм запись
-    private func fetchTrackerRecords() -> [TrackerRecord] {
-        guard let objects = fetchedResultController.fetchedObjects else {
-            return []
-        }
-        let result = objects.compactMap({ trackerRecord(from: $0) })
+    func fetchTrackerRecords() -> [TrackerRecord] {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return [] }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        let trackerRecordCoreDataArray = try! managedContext.fetch(fetchRequest)
+        
+        let result = trackerRecordCoreDataArray.compactMap({ trackerRecord(from: $0) })
+        
         return result
     }
 }
