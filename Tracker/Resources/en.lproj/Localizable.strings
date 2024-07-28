@@ -12,3 +12,8 @@
 "filters" = "Filters";
 "statistic" = "Statistic";
 "not_found" = "Nothing found";
+"pin" = "Pin";
+"unpin" = "Unpin";
+"edit" = "Edit";
+"delete" = "Delete";
+"pinned_title" = "Pinned";

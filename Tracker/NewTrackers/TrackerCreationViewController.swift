@@ -8,7 +8,7 @@
 import UIKit
 
 class TrackerCreationViewController: UIViewController {
-   
+    
     
     weak var delegate: TrackerCreationDelegete?
     
@@ -17,19 +17,13 @@ class TrackerCreationViewController: UIViewController {
         return tableView
     }()
     
-    private lazy var scrollView = {
-        let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.isScrollEnabled = true
-        return scrollView
-    }()
-    
-    private lazy var collectionView = {
+    lazy var collectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.allowsMultipleSelection = true
+        collectionView.isScrollEnabled = false
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: "cell1")
         collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: "cell2")
         collectionView.register(TrackerViewCellHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
@@ -37,7 +31,7 @@ class TrackerCreationViewController: UIViewController {
         return collectionView
     }()
     
-    private lazy var categoryTextField = {
+    lazy var categoryTextField = {
         let categoryTextField = TrackerTextField(placeholder: "Введите название трекера")
         categoryTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
         return categoryTextField
@@ -51,6 +45,14 @@ class TrackerCreationViewController: UIViewController {
         return cancelButton
     }()
     
+    private lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.showsVerticalScrollIndicator = true
+        scrollView.delaysContentTouches = false
+        return scrollView
+    }()
+    
     lazy var saveButton = {
         let saveButton = Button(title: "Создать", backColor: .yGray, textColor: .yWhite)
         saveButton.isEnabled = false
@@ -58,16 +60,24 @@ class TrackerCreationViewController: UIViewController {
         return saveButton
     }()
     
-    private var selectedEmoji = ""
+    lazy var contentView: UIView = {
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.backgroundColor = .yWhite
+        return contentView
+    }()
     
-    private var selectedColor = UIColor.clear
+    var isEdit = false
+    var selectedEmoji = ""
+    
+    var selectedColor = UIColor.clear
     
     var selectedCategory = ""
     
     var selectedDays = [Weekday]()
     
-    private var prevSelectedEmojiIndex: IndexPath?
-    private var prevSelectedColorIndex: IndexPath?
+    var prevSelectedEmojiIndex: IndexPath?
+    var prevSelectedColorIndex: IndexPath?
     
     private let headersForTrackerCreation = ["Emoji", "Цвет"]
     
@@ -87,12 +97,14 @@ class TrackerCreationViewController: UIViewController {
         
         view.backgroundColor = .yWhite
         navigationItem.hidesBackButton = true
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         
-        view.addSubview(tableView)
+        contentView.addSubview(tableView)
         
-        view.addSubview(categoryTextField)
+        contentView.addSubview(categoryTextField)
         
-        view.addSubview(collectionView)
+        contentView.addSubview(collectionView)
         
         let bottomButtonsView = UIStackView(arrangedSubviews: [cancelButton, saveButton])
         bottomButtonsView.axis = .horizontal
@@ -100,30 +112,43 @@ class TrackerCreationViewController: UIViewController {
         bottomButtonsView.spacing = 8
         bottomButtonsView.distribution = .fillEqually
         
-        view.addSubview(bottomButtonsView)
+        contentView.addSubview(bottomButtonsView)
         
         NSLayoutConstraint.activate([
-            categoryTextField.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            categoryTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
-            categoryTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 16),
-            categoryTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -16),
+            categoryTextField.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: isEdit ? 102 : 24),
+            categoryTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 16),
+            categoryTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -16),
             categoryTextField.heightAnchor.constraint(equalToConstant: 75),
             
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            tableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: categoryTextField.bottomAnchor, constant: 24),
+            tableView.heightAnchor.constraint(equalToConstant: 150),
             
             collectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: bottomButtonsView.bottomAnchor, constant: -24),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            collectionView.heightAnchor.constraint(equalToConstant: 460),
             
-            bottomButtonsView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 20),
-            bottomButtonsView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -20),
-            bottomButtonsView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            bottomButtonsView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 20),
+            bottomButtonsView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -20),
+            bottomButtonsView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            bottomButtonsView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
             
             cancelButton.heightAnchor.constraint(equalToConstant: 60),
-            saveButton.heightAnchor.constraint(equalToConstant: 60)
+            saveButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(greaterThanOrEqualToConstant: 700)
         ])
     }
     
@@ -140,9 +165,9 @@ class TrackerCreationViewController: UIViewController {
     @objc func saveTrackerScreen() {
         
         guard let trackerName = categoryTextField.text else { return }
-        let newTracker = Tracker(id: UUID(), name: trackerName, color: selectedColor, emoji: selectedEmoji, schedule: selectedDays)
+        let newTracker = Tracker(id: UUID(), name: trackerName, color: selectedColor, emoji: selectedEmoji, schedule: selectedDays, category: selectedCategory)
         
-        delegate?.createTracker(tracker: newTracker, category: selectedCategory)
+        delegate?.createTracker(tracker: newTracker)
         self.dismiss(animated: true)
     }
     
@@ -160,7 +185,7 @@ class TrackerCreationViewController: UIViewController {
         if !selectedCategory.isEmpty &&
             categoryTextField.hasText &&
             selectedColor != UIColor.clear &&
-            !selectedEmoji.isEmpty 
+            !selectedEmoji.isEmpty
         {
             saveButton.isEnabled = true
             saveButton.backgroundColor = .yBlack
@@ -199,6 +224,13 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
             }
             
             cell.emoji.text = emojies[indexPath.row]
+            
+            if isEdit, cell.emoji.text == selectedEmoji {
+                prevSelectedEmojiIndex = indexPath
+                cell.backgroundColor = .yLightGray
+                cell.layer.cornerRadius = 16
+            }
+            
             return cell
             
         } else {
@@ -208,6 +240,14 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
             
             cell.layer.borderColor = UIColor.yWhite.cgColor
             cell.color.backgroundColor = trackerColors[indexPath.row]
+            
+            if isEdit, trackerColors[indexPath.row].toHexString() == selectedColor.toHexString() {
+                prevSelectedColorIndex = indexPath
+                cell.layer.borderColor = trackerColors[indexPath.row].cgColor
+                cell.layer.borderWidth = 3
+                cell.layer.cornerRadius = 8
+            }
+            
             return cell
         }
     }

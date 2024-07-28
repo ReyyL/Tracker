@@ -8,10 +8,10 @@
 import UIKit
 
 protocol TrackerCreationDelegete: AnyObject {
-    func createTracker(tracker: Tracker, category: String)
+    func createTracker(tracker: Tracker)
 }
 
-final class NewHabitViewController: TrackerCreationViewController {
+class NewHabitViewController: TrackerCreationViewController {
     
     private lazy var tableCellTitles = ["Категория", "Расписание"]
     
