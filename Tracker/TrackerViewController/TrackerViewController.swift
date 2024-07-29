@@ -5,11 +5,6 @@
 //  Created by Andrey Lazarev on 02.06.2024.
 //
 
-/**
- Добавить
- - статистика
- - поиск
- */
 
 import UIKit
 import YandexMobileMetrica
@@ -32,6 +27,8 @@ final class TrackerViewController: UIViewController {
     }()
     
     private var tempCategories = [TrackerCategory]()
+    
+    private var currentFilter = "Все трекеры"
     
     private var isSearch = false
     
@@ -217,6 +214,7 @@ final class TrackerViewController: UIViewController {
         sendAnalytics(mainEvent: "filter_tap", event: "click", screen: "Main", item: "filter")
         let filterController = FilterController()
         let navigationFilterController = UINavigationController(rootViewController: filterController)
+        filterController.currentFilter = currentFilter
         filterController.delegate = self
         present(navigationFilterController, animated: true)
     }
@@ -247,7 +245,7 @@ final class TrackerViewController: UIViewController {
         }()
         
         visibleCategories = []
-        
+        isSearch = false
         categories.forEach { category in
             let title = category.title
             let trackers = category.trackersArray.filter { tracker in
@@ -264,6 +262,16 @@ final class TrackerViewController: UIViewController {
         collectionView.isHidden = visibleCategories.isEmpty ? true : false
         
         filtersButton.isHidden = collectionView.isHidden ? true : false
+        
+        if tempCategories.isEmpty, isSearch {
+            notFoundView.isHidden = false
+            collectionView.isHidden = true
+        }
+        
+        if !notFoundView.isHidden {
+            emptyTrackersView.isHidden = true
+            filtersButton.isHidden = false
+        }
         
         return visibleCategories
     }
@@ -500,7 +508,8 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
     func deleteTracker(indexPath: IndexPath) {
         sendAnalytics(mainEvent: "delete_tracker", event: "click", screen: "Main", item: "delete")
         trackerCategoryStore.deleteFromCoreData(with: visibleCategories[indexPath.section].title, tracker: visibleCategories[indexPath.section].trackersArray[indexPath.row])
-        
+        trackerStore.deleteFromCoreData(id: visibleCategories[indexPath.section].trackersArray[indexPath.row].id)
+        loadFromCoreData()
         updateCollection()
     }
 }
@@ -542,6 +551,7 @@ extension TrackerViewController: TrackerCreationDelegete {
         }
         
         trackerCategoryStore.addToCoreDataCategory(with: tracker.category, tracker: tracker)
+        loadFromCoreData()
         updateCollection()
     }
     
@@ -567,7 +577,7 @@ extension TrackerViewController: FilterControllerDelegate {
         
         var tempTrackers = [Tracker]()
         var result = [TrackerCategory]()
-        
+        currentFilter = filter
         switch filter {
         case "Все трекеры":
             isSearch = false
@@ -577,7 +587,7 @@ extension TrackerViewController: FilterControllerDelegate {
             datePicker.date = Date()
             datePickerValueChanged(datePicker)
         case "Завершенные":
-            isSearch = true
+
             updateCollection()
             visibleCategories.forEach { category in
                 tempTrackers = category.trackersArray.filter { tracker in
@@ -593,11 +603,11 @@ extension TrackerViewController: FilterControllerDelegate {
                 notFoundView.isHidden = false
                 collectionView.isHidden = true
             }
-            
+            isSearch = true
             tempCategories = result
             
         case "Не завершенные":
-            isSearch = true
+            
             updateCollection()
             visibleCategories.forEach { category in
                 tempTrackers = category.trackersArray.filter { tracker in
@@ -617,7 +627,7 @@ extension TrackerViewController: FilterControllerDelegate {
             }
             
             tempCategories = result
-            
+            isSearch = true
         default:
             break
         }
@@ -648,20 +658,26 @@ extension TrackerViewController: UISearchResultsUpdating {
             }
             
             if result.isEmpty {
-                emptyTrackersView.isHidden = false
+                notFoundView.isHidden = false
                 collectionView.isHidden = true
+            } else {
+                notFoundView.isHidden = true
+                collectionView.isHidden = false
             }
         } else {
             loadFromCoreData()
-            result = categories
+//            updateCollection()
+            result = visibleCategories
         }
         
         tempCategories = result
         collectionView.reloadData()
     }
     
-    func willDismissSearchController(_ searchController: UISearchController) {
+    func didDismissSearchController(_ searchController: UISearchController) {
         isSearch = false
+        loadFromCoreData()
+        updateCollection()
         collectionView.reloadData()
     }
 }

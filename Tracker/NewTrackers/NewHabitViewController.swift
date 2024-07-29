@@ -109,6 +109,11 @@ extension NewHabitViewController: UITableViewDataSource {
 }
 
 extension NewHabitViewController: NewHabitDelegate {
+    
+    var daysFromSchedule: [Weekday] {
+        return selectedDays
+    }
+    
     func sendSelectedDays(selectedDays: [Weekday]) {
         self.selectedDays = selectedDays
         checkIfSaveButtonIsEnabled()

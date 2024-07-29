@@ -15,6 +15,8 @@ final class FilterController: UIViewController {
     
     var selectedIndex: IndexPath?
     
+    var currentFilter = "Все трекеры"
+    
     weak var delegate: FilterControllerDelegate?
     
     private let filtersArray = [
@@ -38,8 +40,6 @@ final class FilterController: UIViewController {
         
         setupScreen()
         
-        let savedIndex = UserDefaults.standard.integer(forKey: "selectedRowIndex")
-        selectedIndex = IndexPath(row: savedIndex, section: 0)
     }
     
     private func setupScreen() {
@@ -77,8 +77,6 @@ extension FilterController: UITableViewDelegate {
         
         selectedIndex = indexPath
         
-        UserDefaults.standard.set(indexPath.row, forKey: "selectedRowIndex")
-        
         let filter = filtersArray[indexPath.row]
         delegate?.filterTrackers(filter: filter)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -101,7 +99,8 @@ extension FilterController: UITableViewDataSource {
         cell.selectionStyle = .none
         cell.backgroundColor = .yLightGrayAlpha
         
-        if indexPath == selectedIndex {
+        if filtersArray[indexPath.row] == currentFilter {
+            selectedIndex = indexPath
             cell.accessoryType = .checkmark
         } else {
             cell.accessoryType = .none

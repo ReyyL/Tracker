@@ -175,6 +175,7 @@ class TrackerCreationViewController: UIViewController {
         let categoryViewModel = CategoriesViewModel()
         let categoryViewController = CategoriesViewController()
         categoryViewController.viewModel = categoryViewModel
+        categoryViewController.selectedCategory = selectedCategory
         categoryViewModel.delegate = self
         let navigationVC = UINavigationController(rootViewController: categoryViewController)
         present(navigationVC, animated: true)
