@@ -65,11 +65,14 @@ final class TrackerRecordStore: NSObject {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return [] }
         let managedContext = appDelegate.persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
-        let trackerRecordCoreDataArray = try! managedContext.fetch(fetchRequest)
-        
-        let result = trackerRecordCoreDataArray.compactMap({ trackerRecord(from: $0) })
-        
-        return result
+        do {
+            let trackerRecordCoreDataArray = try managedContext.fetch(fetchRequest)
+            let result = trackerRecordCoreDataArray.compactMap { trackerRecord(from: $0) }
+            return result
+        } catch {
+            print("Ошибка при выполнении запроса к бд: \(error.localizedDescription)")
+            return []
+        }
     }
 }
 

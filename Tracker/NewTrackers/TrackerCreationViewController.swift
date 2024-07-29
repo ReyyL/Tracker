@@ -9,7 +9,6 @@ import UIKit
 
 class TrackerCreationViewController: UIViewController {
     
-    
     weak var delegate: TrackerCreationDelegete?
     
     lazy var tableView = {
@@ -24,8 +23,8 @@ class TrackerCreationViewController: UIViewController {
         collectionView.delegate = self
         collectionView.allowsMultipleSelection = true
         collectionView.isScrollEnabled = false
-        collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: "cell1")
-        collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: "cell2")
+        collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: EmojiCollectionViewCell.reuseEmojiIdentifier)
+        collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: ColorCollectionViewCell.reuseColorIdentifier)
         collectionView.register(TrackerViewCellHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
@@ -220,7 +219,7 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
     ) -> UICollectionViewCell {
         
         if indexPath.section == 0 {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell1", for: indexPath) as? EmojiCollectionViewCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell else {
                 return UICollectionViewCell()
             }
             
@@ -235,7 +234,7 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
             return cell
             
         } else {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell2", for: indexPath) as? ColorCollectionViewCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath) as? ColorCollectionViewCell else {
                 return UICollectionViewCell()
             }
             
