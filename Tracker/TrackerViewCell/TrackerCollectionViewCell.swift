@@ -64,7 +64,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return plusButton
     }()
     
-    private lazy var bodyView: UIView = {
+    lazy var bodyView: UIView = {
         let bodyView = UIView()
         bodyView.layer.cornerRadius = 16
         bodyView.translatesAutoresizingMaskIntoConstraints = false
@@ -74,14 +74,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(bodyView)
-        
         bodyView.addSubview(emojiView)
         bodyView.addSubview(emoji)
         bodyView.addSubview(title)
         
-        contentView.addSubview(date)
-        contentView.addSubview(plusButton)
+        addSubview(bodyView)
+        addSubview(date)
+        addSubview(plusButton)
         
         NSLayoutConstraint.activate([
             
@@ -102,10 +101,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             title.trailingAnchor.constraint(equalTo: bodyView.safeAreaLayoutGuide.trailingAnchor, constant: -12),
             title.bottomAnchor.constraint(equalTo: bodyView.bottomAnchor, constant: -12),
             
-            date.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            date.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             date.topAnchor.constraint(equalTo: bodyView.bottomAnchor, constant: 16),
             
-            plusButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            plusButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
             plusButton.topAnchor.constraint(equalTo: bodyView.bottomAnchor, constant: 8),
             plusButton.heightAnchor.constraint(equalToConstant: 34),
             plusButton.widthAnchor.constraint(equalToConstant: 34)
@@ -126,7 +125,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         title.text = tracker.name
         emoji.text = tracker.emoji
-        date.text = "\(completedDays) Дней"
+        date.text = String.localizedStringWithFormat(
+            NSLocalizedString("numberOfDays", comment: "Number of remaining days"),
+            completedDays
+        )
         
         plusButton.tintColor = tracker.color
         let image = isTrackerCompleted ? UIImage(named: "Done") : UIImage(named: "Plus")

@@ -19,6 +19,7 @@ enum Weekday: String, CaseIterable {
 
 protocol NewHabitDelegate: AnyObject {
     func sendSelectedDays(selectedDays: [Weekday])
+    var daysFromSchedule: [Weekday] { get }
 }
 
 final class ScheduleViewController: UIViewController {
@@ -28,6 +29,8 @@ final class ScheduleViewController: UIViewController {
     let weekDays: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
     
     let weekdaysString = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+    
+    private var isSelected = false
     
     private var selectedDays = [Weekday]()
     
@@ -100,9 +103,12 @@ extension ScheduleViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? ScheduleTableViewCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? ScheduleTableViewCell, let days = delegate?.daysFromSchedule else { return UITableViewCell() }
+        selectedDays = days
         
-        cell.configureCell(weekdaysString[indexPath.row], weekday: weekDays[indexPath.row])
+        isSelected = selectedDays.contains(weekDays[indexPath.row])
+        
+        cell.configureCell(weekdaysString[indexPath.row], weekday: weekDays[indexPath.row], isSelected: isSelected)
         cell.delegate = self
         
         return cell

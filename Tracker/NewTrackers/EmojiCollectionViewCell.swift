@@ -9,6 +9,8 @@ import UIKit
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
     
+    static let reuseEmojiIdentifier = "emojiCell"
+    
     private lazy var emojiView = {
         let emojiView = UIView()
         emojiView.translatesAutoresizingMaskIntoConstraints = false

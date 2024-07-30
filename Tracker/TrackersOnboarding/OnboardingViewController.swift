@@ -20,6 +20,7 @@ final class OnboardingPageViewController: UIViewController {
         title.translatesAutoresizingMaskIntoConstraints = false
         title.font = .systemFont(ofSize: 32, weight: .bold)
         title.numberOfLines = 2
+        title.textColor = .black
         title.textAlignment = .center
         return title
     }()

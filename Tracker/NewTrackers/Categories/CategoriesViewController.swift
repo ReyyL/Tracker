@@ -16,6 +16,10 @@ final class CategoriesViewController: UIViewController {
     
     var viewModel: CategoriesViewModel?
     
+    var selectedCategory = ""
+    
+    private var selectedIndex: IndexPath?
+    
     private let trackerCategoryStore = TrackerCategoryStore()
     
     private lazy var tableView = {
@@ -85,7 +89,6 @@ final class CategoriesViewController: UIViewController {
     
     private func setupScreen() {
         
-        
         title = "Категория"
         
         tableView.delegate = self
@@ -125,6 +128,12 @@ extension CategoriesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        if let selectedIndex = selectedIndex {
+            let previouslySelectedCell = tableView.cellForRow(at: selectedIndex)
+            previouslySelectedCell?.accessoryType = .none
+        }
+        selectedIndex = indexPath
+        
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         viewModel?.sendCategoryAfterTap(indexPath: indexPath)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -145,6 +154,10 @@ extension CategoriesViewController: UITableViewDataSource {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
         cell.textLabel?.text = viewModel?.categories[indexPath.row] ?? ""
         cell.selectionStyle = .none
+        if cell.textLabel?.text == selectedCategory {
+            selectedIndex = indexPath
+            cell.accessoryType = .checkmark
+        }
         cell.backgroundColor = .yLightGrayAlpha
         
         return cell

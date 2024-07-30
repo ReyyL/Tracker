@@ -9,6 +9,8 @@ import UIKit
 
 final class ColorCollectionViewCell: UICollectionViewCell {
     
+    static let reuseColorIdentifier = "colorCell"
+    
     private lazy var colorView = {
         let colorView = UIView()
         colorView.translatesAutoresizingMaskIntoConstraints = false

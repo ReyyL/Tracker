@@ -16,6 +16,14 @@ final class ScheduleTableViewCell: UITableViewCell {
     
     weak var delegate: WeekdayDelegate?
     
+    var selectedDays: Weekday?
+    
+    var isSwitchOn: Bool = false {
+            didSet {
+                daySwitch.isOn = isSwitchOn
+            }
+        }
+    
     private lazy var titleView: UILabel = {
         let titleView = UILabel()
         titleView.translatesAutoresizingMaskIntoConstraints = false
@@ -44,13 +52,15 @@ final class ScheduleTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureCell(_ weekDay: String, weekday: Weekday) {
-        titleView.text = weekDay
-        self.weekday = weekday
+    func configureCell(_ weekDay: String, weekday: Weekday, isSelected: Bool) {
+            titleView.text = weekDay
+            self.weekday = weekday
+            isSwitchOn = isSelected
     }
     
     @objc private func addDay(_ sender: UISwitch) {
         guard let weekday else { return }
+        isSwitchOn = sender.isOn
         sender.isOn ? delegate?.weekdayAppend(weekday) : delegate?.weekdayRemove(weekday)
         
     }

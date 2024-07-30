@@ -56,9 +56,18 @@ final class TrackerCategoryStore: NSObject {
             return []
         }
         
-        let trackers = objects.compactMap({ trackerCategory(from: $0) })
+        var allTrackers = objects.compactMap({ trackerCategory(from: $0) })
         
-        return trackers
+        let pinnedCategory = allTrackers.first { $0.title == NSLocalizedString("pinned_title", comment: "") }
+        
+        var result = [TrackerCategory]()
+        if pinnedCategory != nil {
+            allTrackers.removeAll { $0.title == NSLocalizedString("pinned_title", comment: "") }
+            result.append(pinnedCategory!)
+        }
+        
+        result.append(contentsOf: allTrackers)
+        return result
     }
     
     //конвертируем и сохраняем в кор дату переданную категорию трекеров
@@ -92,7 +101,21 @@ final class TrackerCategoryStore: NSObject {
     }
     
     func addCategoryTitleToCoreData(title: String) {
-        
+        let coreData = TrackerCategoryCoreData(context: context)
+        coreData.title = title
+        try? context.save()
+    }
+    
+    func deleteFromCoreData(with title: String, tracker: Tracker) {
+        guard let coreData = findCoreDataTitle(with: title) else {
+            fatalError()
+        }
+        var existingTrackers = coreData.trackers?.allObjects as? [TrackerCoreData] ?? []
+        if let index = existingTrackers.firstIndex(where: {$0.id == tracker.id}) {
+            existingTrackers.remove(at: index)
+        }
+        coreData.trackers = NSSet(array: existingTrackers)
+        try? context.save()
     }
     
     // делаем из кордаты норм категории трекеров
@@ -103,7 +126,7 @@ final class TrackerCategoryStore: NSObject {
         else {
             return nil
         }
-//        print(title)
+        
         let result = TrackerCategory(
             title: title,
             trackersArray:  trackers.compactMap { coreDataTracker -> Tracker? in

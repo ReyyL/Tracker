@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Andrey Lazarev on 20.07.2024.
+  
+*/
+
+"trackers" = "Трекеры";
+"search" = "Поиск";
+"what_track" = "Что будем отслеживать?";
+"filters" = "Фильтры";
+"statistic" = "Статистика";
+"not_found" = "Ничего не найдено";
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"edit" = "Редактировать";
+"delete" = "Удалить";
+"pinned_title" = "Закрепленные";
+"done_trackers" = "Трекеров завершено";

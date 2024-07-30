@@ -8,10 +8,10 @@
 import UIKit
 
 protocol TrackerCreationDelegete: AnyObject {
-    func createTracker(tracker: Tracker, category: String)
+    func createTracker(tracker: Tracker)
 }
 
-final class NewHabitViewController: TrackerCreationViewController {
+class NewHabitViewController: TrackerCreationViewController {
     
     private lazy var tableCellTitles = ["Категория", "Расписание"]
     
@@ -109,6 +109,11 @@ extension NewHabitViewController: UITableViewDataSource {
 }
 
 extension NewHabitViewController: NewHabitDelegate {
+    
+    var daysFromSchedule: [Weekday] {
+        return selectedDays
+    }
+    
     func sendSelectedDays(selectedDays: [Weekday]) {
         self.selectedDays = selectedDays
         checkIfSaveButtonIsEnabled()

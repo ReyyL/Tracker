@@ -67,6 +67,23 @@ final class TrackerStore: NSObject {
         coreData.schedule = obj.schedule.map {
             $0.rawValue
         }
+        coreData.realCategory = obj.category
+        try? context.save()
+    }
+    
+    private func findCoreDataId(with id: UUID) -> TrackerCoreData? {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        let result = try? context.fetch(fetchRequest)
+        return result?.first
+    }
+    
+    func deleteFromCoreData(id: UUID) {
+        guard let coreData = findCoreDataId(with: id) else {
+            return
+        }
+        
+        context.delete(coreData)
         try? context.save()
     }
     
@@ -76,7 +93,8 @@ final class TrackerStore: NSObject {
               let emoji = coreData.emoji,
               let color = coreData.color,
               let name = coreData.name,
-              let schedule = coreData.schedule
+              let schedule = coreData.schedule,
+                let category = coreData.realCategory
         else {
             return nil
         }
@@ -84,7 +102,8 @@ final class TrackerStore: NSObject {
                        name: name,
                        color: UIColor(hexString: color),
                        emoji: emoji,
-                       schedule: schedule.compactMap({ Weekday(rawValue: $0)}))
+                       schedule: schedule.compactMap({ Weekday(rawValue: $0)}), 
+                       category: category)
     }
     
     // из кордаты в норм массив трекеров

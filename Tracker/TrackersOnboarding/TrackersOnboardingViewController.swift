@@ -48,7 +48,7 @@ final class TrackerOnboardingViewController: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
-        button.backgroundColor = .yBlack
+        button.backgroundColor = .black
         button.setTitle("Вот это технологии!", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.addTarget(self, action: #selector(openMainScreen), for: .touchUpInside)
