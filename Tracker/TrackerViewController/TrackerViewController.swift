@@ -657,16 +657,11 @@ extension TrackerViewController: UISearchResultsUpdating {
                 }
             }
             
-            if result.isEmpty {
-                notFoundView.isHidden = false
-                collectionView.isHidden = true
-            } else {
-                notFoundView.isHidden = true
-                collectionView.isHidden = false
-            }
+            notFoundView.isHidden = !result.isEmpty
+            collectionView.isHidden = result.isEmpty
+            
         } else {
             loadFromCoreData()
-//            updateCollection()
             result = visibleCategories
         }
         

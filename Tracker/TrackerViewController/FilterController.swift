@@ -13,7 +13,7 @@ protocol FilterControllerDelegate: AnyObject {
 
 final class FilterController: UIViewController {
     
-    var selectedIndex: IndexPath?
+    private var selectedIndex: IndexPath?
     
     var currentFilter = "Все трекеры"
     

@@ -219,7 +219,7 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
     ) -> UICollectionViewCell {
         
         if indexPath.section == 0 {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "emojiCell", for: indexPath) as? EmojiCollectionViewCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCollectionViewCell.reuseEmojiIdentifier, for: indexPath) as? EmojiCollectionViewCell else {
                 return UICollectionViewCell()
             }
             
@@ -234,7 +234,7 @@ extension TrackerCreationViewController: UICollectionViewDataSource {
             return cell
             
         } else {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath) as? ColorCollectionViewCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColorCollectionViewCell.reuseColorIdentifier, for: indexPath) as? ColorCollectionViewCell else {
                 return UICollectionViewCell()
             }
             
